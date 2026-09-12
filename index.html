@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Duplicate Lens · 离线文件重复检测</title>
+  <style>
+    :root{font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif;color:#183b36;background:#f4f5ee;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:1040px;margin:0 auto;padding:38px 24px 70px}.brand{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #cdd8cb;padding-bottom:22px}.brand strong{letter-spacing:.1em;font-size:14px}.badge{font-size:12px;background:#e3ebdb;padding:7px 12px;border-radius:20px}h1{font-size:clamp(32px,5vw,53px);letter-spacing:-.04em;line-height:1.18;margin:36px 0 17px}p{line-height:1.8;color:#536c61}.intro{max-width:680px;margin-bottom:28px}.panel{border:1px solid #c5d4c7;border-radius:20px;padding:26px;background:#fffef9}.buttons{display:flex;flex-wrap:wrap;gap:10px;align-items:center}button,.pick{font:inherit;font-size:14px;border:1px solid #b8cdbd;border-radius:9px;padding:12px 18px;background:#f8faf4;color:#204c3e;cursor:pointer}.primary{background:#255d47;color:white;border-color:#255d47}button:hover,.pick:hover{filter:brightness(.94)}button:disabled{opacity:.4;cursor:default}.pick:focus-within{outline:3px solid #edb849;outline-offset:3px}.file-input{position:absolute;width:1px;height:1px;opacity:0}.hint{font-size:12px;margin:16px 0 0}#status{min-height:24px;font-size:14px;color:#255d47;margin:20px 0 0}progress{width:100%;height:7px;accent-color:#3b7950;margin-top:12px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}.metric{background:#e6ecdf;border-radius:14px;padding:22px}.metric span{font-size:12px;color:#5a7163}.metric strong{display:block;font-size:30px;letter-spacing:-.03em;margin-top:7px}.results-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:30px 0 12px}h2{font-size:21px;margin:0}.group{background:#fffef9;border:1px solid #d4dfcf;border-radius:14px;margin:12px 0;padding:20px}.group-head{font-size:15px;font-weight:600;display:flex;justify-content:space-between;gap:10px}.hash{font-family:Consolas,monospace;font-size:11px;color:#6c7f73;overflow-wrap:anywhere;margin:10px 0}.paths{margin:0;padding-left:21px;line-height:1.8;font-size:14px;overflow-wrap:anywhere}.empty{padding:30px;color:#6c7f73;border:1px dashed #bfcdbf;border-radius:14px;font-size:14px}.note{background:#fff2d7;border-radius:12px;padding:18px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.7;margin-top:16px}footer{font-size:12px;color:#768679;line-height:1.8;margin-top:32px}a{color:inherit}@media(max-width:560px){main{padding:22px 16px}.panel{padding:18px}.metrics{gap:8px}.metric{padding:15px}.metric strong{font-size:22px}.results-head{align-items:flex-start}.brand{gap:15px}.badge{white-space:nowrap}}
+  </style>
+</head>
+<body><main>
+  <div class="brand"><strong>DUPLICATE LENS</strong><span class="badge">本地运行 · 无需账号</span></div>
+  <h1>看清重复文件，<br>再决定如何整理。</h1>
+  <p class="intro">选择一个文件夹，按文件大小与内容指纹找出重复副本。文件始终留在你的电脑上，检查结果可以导出。</p>
+  <section class="panel" aria-label="扫描控制">
+    <div class="buttons">
+      <label class="pick primary" for="folder">选择文件夹<input class="file-input" id="folder" type="file" webkitdirectory multiple></label>
+      <label class="pick" for="files">选择多个文件<input class="file-input" id="files" type="file" multiple></label>
+      <button id="demo">试用演示文件</button>
+      <button id="cancel" disabled>取消扫描</button>
+    </div>
+    <p class="hint">每个文件最多 64 MiB。超过上限或读取失败的文件会列在报告中；不会修改原文件。</p>
+    <p id="status" role="status" aria-live="polite">请选择文件，或使用 6 个合成文件试用。</p>
+    <progress id="progress" value="0" max="1" aria-label="扫描进度"></progress>
+  </section>
+  <div class="metrics">
+    <div class="metric"><span>所选文件</span><strong id="count">—</strong></div>
+    <div class="metric"><span>重复组数</span><strong id="groups">—</strong></div>
+    <div class="metric"><span>每组保留一份的重复体积</span><strong id="bytes">—</strong></div>
+  </div>
+  <div class="results-head"><h2>检测结果</h2><button id="download" disabled>导出文本报告</button></div>
+  <div id="results"><div class="empty">结果将在这里显示。重复体积仅供参考，不代表已释放空间。</div></div>
+  <div id="skipped" class="note" hidden></div>
+  <footer>Duplicate Lens 1.0.0 · 内容校验使用 SHA-256。不同大小的文件不会重复读取。<br>演示使用合成文件；扫描结果只覆盖本次选择并成功读取的内容。关闭页面后结果不保留。</footer>
+</main>
+<script src="core.js"></script>
+<script>
+"use strict";
+const el = id => document.getElementById(id);
+let current = null, controller = null, runId = 0;
+function formatBytes(value) { if (value < 1024) return value + " B"; const units = ["KiB","MiB","GiB","TiB"]; let unit = -1; do { value /= 1024; unit++; } while (value >= 1024 && unit < units.length - 1); return value.toFixed(1) + " " + units[unit]; }
+function node(tag, className, content) { const element = document.createElement(tag); element.className = className; element.textContent = content; return element; }
+function render(result) {
+  el("count").textContent = result.totalFiles; el("groups").textContent = result.groups.length; el("bytes").textContent = formatBytes(result.redundantBytes);
+  el("results").replaceChildren();
+  for (const [index, group] of result.groups.entries()) {
+    const card = node("section", "group", "");
+    const head = node("div", "group-head", "");
+    head.append(node("span", "", `第 ${index + 1} 组 · ${group.files.length} 份相同内容`), node("span", "", `每份 ${formatBytes(group.size)}`));
+    card.append(head, node("div", "hash", "SHA-256 " + group.sha256));
+    const paths = node("ul", "paths", ""); group.files.forEach(file => paths.append(node("li", "", file.path))); card.append(paths); el("results").append(card);
+  }
+  if (!result.groups.length) el("results").append(node("div", "empty", result.skipped.length ? "已成功检查的文件中未发现重复组。请查看下方未参与比较的文件。" : "本次所选文件中未发现重复组。"));
+  el("skipped").hidden = !result.skipped.length;
+  el("skipped").textContent = result.skipped.length ? `${result.skipped.length} 个文件未参与比较：\n` + result.skipped.map(file => `${file.path} — ${file.reason}`).join("\n") : "";
+}
+async function start(files, demo = false) {
+  if (!files.length) return;
+  controller?.abort(); const thisRun = ++runId; controller = new AbortController(); current = null;
+  el("download").disabled = true; el("cancel").disabled = false;
+  el("results").replaceChildren(node("div", "empty", "扫描中…")); el("skipped").hidden = true;
+  el("count").textContent = files.length; el("groups").textContent = "—"; el("bytes").textContent = "—";
+  try {
+    if (!globalThis.crypto?.subtle) throw new Error("浏览器未提供 SHA-256，请使用新版 Chrome 或 Edge 打开本地文件。");
+    const result = await DuplicateLens.scan(files, {signal: controller.signal, onProgress: p => {
+      if (thisRun !== runId) return; el("progress").max = p.total || 1; el("progress").value = p.processed;
+      el("status").textContent = `已处理 ${p.processed} / ${p.total} · 已校验 ${p.hashed} 个文件`;
+    }});
+    if (thisRun !== runId) return;
+    current = result; render(result); el("download").disabled = false;
+    el("status").textContent = `${demo ? "演示完成（合成文件）" : "扫描完成"} · ${result.groups.length} 个重复组 · ${result.skipped.length} 个文件跳过`;
+  } catch (error) { if (thisRun === runId) { el("status").textContent = error.name === "AbortError" ? "扫描已取消，未生成完整报告。" : error.message; el("results").replaceChildren(node("div", "empty", "没有完整结果。")); } }
+  finally { if (thisRun === runId) el("cancel").disabled = true; }
+}
+for (const id of ["folder","files"]) el(id).addEventListener("change", event => { const files = Array.from(event.target.files); event.target.value = ""; start(files); });
+el("cancel").onclick = () => controller?.abort();
+el("demo").onclick = () => start([new File(["Example notes.\n"], "notes.txt"),new File(["Example notes.\n"], "notes-copy.txt"),new File(["Example notes.\n"], "notes-backup.txt"),new File(["Version A\n"], "version-a.txt"),new File(["Version B\n"], "version-b.txt"),new File(["Unique"], "unique.txt")], true);
+el("download").onclick = () => { if (!current) return; const url = URL.createObjectURL(new Blob(["\ufeff" + DuplicateLens.reportText(current)], {type:"text/plain;charset=utf-8"})); const link = document.createElement("a"); link.href = url; link.download = "duplicate-lens-report.txt"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 5000); };
+</script>
+</body></html>

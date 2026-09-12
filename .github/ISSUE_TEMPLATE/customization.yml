@@ -1,0 +1,22 @@
+name: Customization request / 定制需求
+description: Request the first 1 USDC customization; scope and timing require agreement.
+title: "[Customization] "
+body:
+  - type: markdown
+    attributes:
+      value: "Describe only the requested title, colors, and report heading. Do not upload private files, credentials, or bank details. Payment follows acceptance after scope and timing are agreed."
+  - type: textarea
+    id: changes
+    attributes:
+      label: Requested changes / 修改内容
+      description: "Title, two theme colors, and report heading."
+    validations:
+      required: true
+  - type: input
+    id: timing
+    attributes:
+      label: Preferred delivery date / 期望交付日期
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance requirements / 验收要求
