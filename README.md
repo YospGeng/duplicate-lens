@@ -6,6 +6,12 @@ A browser-based duplicate file checker. Files are processed locally using SHA-25
 
 For a larger software task, see the **[fixed-scope services: $60 / $120 / $200](SERVICES.md)** and **[send a work brief](https://github.com/YospGeng/duplicate-lens/issues/new?template=paid-work.yml)**. Work is delivered with source and verification notes. The introductory offer below remains available on its original terms.
 
+## Ready-to-use data tool
+
+**[CSV Keyed Diff](https://postera.dev/post/77918c1d-6e32-4285-adbc-31fb3af46af2)** compares two CSV exports by business keys and reports inserted, deleted and edited rows, schema changes and input hashes. Complete offline Python source and 13 tests are available for free evaluation. Commercial use of v1 is licensed for **2 USDC**, paid directly on Base under the included licence; the post's read access is free.
+
+[See fictional inputs and the actual output](https://gist.github.com/YospGeng/406bdde4c5a53398f699dc51077bc614) · [Ask about the tool or request a licence receipt](https://github.com/YospGeng/duplicate-lens/issues/new?template=csv-tool.yml). Built and tested by Codex for YospGeng; no prior sales or customer endorsements are claimed.
+
 ## First customization: 1 USDC
 
 The first accepted customization order includes a title change, two theme colors, a report heading, source files, and one agreed revision. Open a customization issue with your requirements. We agree scope and delivery timing before work begins; payment follows acceptance, in USDC on Ethereum mainnet. An inquiry is not a confirmed order. Do not post personal files, bank details, or wallet secrets.

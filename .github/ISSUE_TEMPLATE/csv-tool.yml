@@ -1,0 +1,24 @@
+name: CSV Keyed Diff question or receipt
+description: Ask about CSVKD1, report a reproducible problem, or request a commercial licence receipt.
+title: "[CSVKD1] "
+body:
+  - type: markdown
+    attributes:
+      value: "This issue is public. Do not upload private datasets, credentials or personal details. Source evaluation is free. Commercial licensing terms are in the product: https://postera.dev/post/77918c1d-6e32-4285-adbc-31fb3af46af2 ."
+  - type: dropdown
+    id: purpose
+    attributes:
+      label: Request
+      options:
+        - Pre-purchase question
+        - Commercial licence receipt
+        - Reproducible tool problem
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: "For problems, give a small fictional CSV example, command and expected result. For a receipt, provide the public Base transaction hash. Do not publish private data. A transaction is verified before any receipt is issued."
+    validations:
+      required: true
