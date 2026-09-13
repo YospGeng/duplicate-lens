@@ -4,6 +4,8 @@ A browser-based duplicate file checker. Files are processed locally using SHA-25
 
 **[Try the live demo](https://duplicate-lens-yospgeng.lospgeng.chatgpt.site)** · **[Request customization](https://github.com/YospGeng/duplicate-lens/issues/new?template=customization.yml)**
 
+For a larger software task, see the **[fixed-scope services: $60 / $120 / $200](SERVICES.md)** and **[send a work brief](https://github.com/YospGeng/duplicate-lens/issues/new?template=paid-work.yml)**. Work is delivered with source and verification notes. The introductory offer below remains available on its original terms.
+
 ## First customization: 1 USDC
 
 The first accepted customization order includes a title change, two theme colors, a report heading, source files, and one agreed revision. Open a customization issue with your requirements. We agree scope and delivery timing before work begins; payment follows acceptance, in USDC on Ethereum mainnet. An inquiry is not a confirmed order. Do not post personal files, bank details, or wallet secrets.

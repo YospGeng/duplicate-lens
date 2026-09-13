@@ -1,0 +1,44 @@
+name: Fixed-scope software work
+description: Request a $60 bug fix, $120 data/API validation, or $200 browser utility.
+title: "[Work brief] "
+body:
+  - type: markdown
+    attributes:
+      value: "This is a public inquiry, not an accepted order. Scope, timing and acceptance are agreed before work begins. Work is AI-assisted and includes source and verification notes. Do not post private files, credentials, wallet secrets or bank details. See SERVICES.md for package limits."
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - "$60 — One reproducible JavaScript/Python bug"
+        - "$120 — One dataset or two public API endpoints"
+        - "$200 — Small browser utility"
+        - "Scope assessment before choosing"
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What should change?
+      description: "Describe current behaviour and the result you need."
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Public reproducer or synthetic example
+      description: "Link public source/API documentation or provide a small fictional example. Include the relevant environment/version."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: How will you check the delivery?
+      description: "Provide concrete inputs, expected outputs and any essential error cases."
+    validations:
+      required: true
+  - type: input
+    id: timing
+    attributes:
+      label: Preferred delivery date
+      description: "Availability and the delivery date are confirmed after reviewing the brief."
